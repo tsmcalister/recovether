@@ -25,13 +25,12 @@ contract Triage is TriageInterface {
         uint256 password; // hash(password + salt)
         uint256 salt;
         
-        // index => hash(password + newPubKey + salt)
-        mapping(uint256 => uint256) claimFundsRequests;
-        // index => hash(password + amount of ether deposited for the request)
-        mapping(uint256 => uint256) depositedEther;
-	// index => hash(password + number of the block when the request was created)
-	mapping(uint256 => uint256) blockNumber;
-        uint256 requestsIndex;
+        // index (pubKey of requester) => hash(password + newPubKey + salt)
+        mapping(address => uint256) claimFundsRequests;
+        // index (pubKey of requester) => hash(password + amount of ether deposited for the request)
+        mapping(address => uint256) depositedEther;
+	// index (pubKey of requester) => hash(password + number of the block when the request was created)
+	mapping(address => uint256) blockNumber;
     }
     
     // PubKey => Security related data
@@ -79,7 +78,6 @@ contract Triage is TriageInterface {
         usernames[_hashedUsername] = msg.sender;
         credentials[msg.sender].password = _hashedPass;
         credentials[msg.sender].salt = salt;
-	credentials[msg.sender].requestsIndex = 0;
 
 	AccountInitialization(msg.sender);
 
@@ -201,10 +199,9 @@ contract Triage is TriageInterface {
         require(msg.value < balances[usernames[_hashedUsername]] / 100 * maxFCReqFeePerc);
         
         // store the request hash  #spaghettiCodeParty
-        credentials[usernames[_hashedUsername]].claimFundsRequests[credentials[usernames[_hashedUsername]].requestsIndex] = _requestHash;
-        credentials[usernames[_hashedUsername]].depositedEther[credentials[usernames[_hashedUsername]].requestsIndex] = msg.value;
-	credentials[usernames[_hashedUsername]].blockNumber[credentials[usernames[_hashedUsername]].requestsIndex] = block.number;
-	credentials[usernames[_hashedUsername]].requestsIndex ++;
+        credentials[usernames[_hashedUsername]].claimFundsRequests[msg.sender] = _requestHash;
+        credentials[usernames[_hashedUsername]].depositedEther[msg.sender] = msg.value;
+	credentials[usernames[_hashedUsername]].blockNumber[msg.sender] = block.number;
     }
 
     event AccountInitialization(address indexed _account);
