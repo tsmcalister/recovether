@@ -21,7 +21,13 @@ class ApplicationBar extends Component {
 				<Toolbar>
 					<Route
 						path="/login"
+						exact
 						render={() => <Title title="Login" />}
+					/>
+					<Route
+						path="/login/password"
+						exact
+						render={() => <Title title="Retrieve funds" />}
 					/>
 					<Route
 						path="/account"
