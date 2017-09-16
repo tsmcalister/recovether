@@ -10,6 +10,15 @@ contract Vault is VaultInterface {
     uint8 public constant decimals = 18;  // similar to Ether
     uint256 public totalSupply; // variable
     
+    // PubKey => hash(password + salt)
+    mapping(address => uint256) passwords;
+    
+    // PubKey => salt
+    mapping(address => uint256) salts;
+    
+    // hash(username) => pubKeys   // used for looking up which PubKey belongs to username, like a DNS
+    mapping(uint256 => address) usernames;
+
     // generate contract 
     function Vault(){
         totalSupply = 0;
