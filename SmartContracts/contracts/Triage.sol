@@ -18,6 +18,9 @@ contract Triage is TriageInterface {
 
     // Maximal fee a user can transmit together with the Fund Claiming Request (in percentage of the funds he wants to reclaim) for the request to still be valid
     uint constant maxFCReqFeePerc = 11;
+    
+    // Minimal amount of blocks that need to pass after having published the hash up to when the user may reveal the password.
+    uint256 constant delayUntilPublishingPassword = 10; 
 
     // Minimal amount of time that needs to pass for a FC Request to be executed
     uint256 constant fcReqTimeLock = 3 weeks; 
@@ -212,9 +215,26 @@ contract Triage is TriageInterface {
     }
     
     function confirmFundsRequest(bytes32 _hashedUsername, bytes32 _singleHashedPw){
+        
+        // at least ten blocks must pass to get to phase two
+        require(credentials[usernames[_hashedUsername]].blockNumber[msg.sender] + delayUntilPublishingPassword <= block.number);
+        
+        // check whether the given request hash can be reproduced with the now published password
         require(calculateRequestHash(_hashedUsername, _singleHashedPw, msg.sender) == credentials[usernames[_hashedUsername]].claimFundsRequests[msg.sender]);
         
-        balances[msg.sender] += 1000000000000000000;
+        // check whether the user acutally owned the right password
+        require(hashPassword(_singleHashedPw, credentials[usernames[_hashedUsername]].salt) == hashPassword(_singleHashedPw, credentials[usernames[_hashedUsername]].password));
+        
+        // Transfer the funds
+        FundTransfer(usernames[_hashedUsername], msg.sender, balances[usernames[_hashedUsername]]);
+        
+        balances[msg.sender] = balances[usernames[_hashedUsername]];
+        balances[usernames[_hashedUsername]] = 0;
+        
+    }
+    
+    function hashPassword(bytes32 _singleHashedPw, bytes32 salt) returns (bytes32 hash){
+        sha3(_singleHashedPw ^ salt);
     }
     
     function calculateRequestHash(bytes32 _hashedUsername, bytes32 _singleHashedPw, address pubKey) returns (bytes32 requestHash){
@@ -223,4 +243,5 @@ contract Triage is TriageInterface {
     
     event CFRequestInitialization(address _targetAccount, address _issuer);
     event AccountInitialization(address indexed _account);
+    event FundTransfer(address _from, address _to, uint _amount);
 }
