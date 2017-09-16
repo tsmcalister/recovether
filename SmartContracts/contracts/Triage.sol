@@ -66,6 +66,8 @@ contract Triage is TriageInterface {
         credentials[msg.sender].password = _hashedPass;
         credentials[msg.sender].salt = salt;
         
+	AccountInitialization(msg.sender);
+
         // deposit funds if the user sent some
         if(msg.value > 0){
             balances[msg.sender] += msg.value;
@@ -173,4 +175,6 @@ contract Triage is TriageInterface {
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
+
+    event AccountInitialization(address indexed _account);
 }
