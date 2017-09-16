@@ -257,7 +257,6 @@ contract Triage is TriageInterface {
     
     function claimFunds(bytes32 _hashedUsername){
         
-        require(credentials[usernames[_hashedUsername]].claimingFundsAtBlock[msg.sender] != 0);
         require(credentials[usernames[_hashedUsername]].claimingFundsAtBlock[msg.sender] < block.number);
         
         // transfer the username
