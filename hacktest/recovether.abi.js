@@ -20,7 +20,7 @@ module.exports = [
         "type": "address"
       },
       {
-        "name": "_value",
+        "name": "_amount",
         "type": "uint256"
       }
     ],
@@ -59,7 +59,7 @@ module.exports = [
         "type": "address"
       },
       {
-        "name": "_value",
+        "name": "_amount",
         "type": "uint256"
       }
     ],
@@ -70,6 +70,19 @@ module.exports = [
         "type": "bool"
       }
     ],
+    "payable": false,
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdraw",
+    "outputs": [],
     "payable": false,
     "type": "function"
   },
@@ -87,15 +100,10 @@ module.exports = [
     "type": "function"
   },
   {
-    "constant": true,
+    "constant": false,
     "inputs": [],
-    "name": "version",
-    "outputs": [
-      {
-        "name": "",
-        "type": "string"
-      }
-    ],
+    "name": "withdraw",
+    "outputs": [],
     "payable": false,
     "type": "function"
   },
@@ -138,7 +146,7 @@ module.exports = [
         "type": "address"
       },
       {
-        "name": "_value",
+        "name": "_amount",
         "type": "uint256"
       }
     ],
@@ -154,25 +162,12 @@ module.exports = [
   },
   {
     "constant": false,
-    "inputs": [
-      {
-        "name": "_spender",
-        "type": "address"
-      },
-      {
-        "name": "_value",
-        "type": "uint256"
-      },
-      {
-        "name": "_extraData",
-        "type": "bytes"
-      }
-    ],
-    "name": "approveAndCall",
+    "inputs": [],
+    "name": "getTotalSupply",
     "outputs": [
       {
-        "name": "success",
-        "type": "bool"
+        "name": "balance",
+        "type": "uint256"
       }
     ],
     "payable": false,
@@ -201,29 +196,47 @@ module.exports = [
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "name": "_initialAmount",
-        "type": "uint256"
-      },
-      {
-        "name": "_tokenName",
-        "type": "string"
-      },
-      {
-        "name": "_decimalUnits",
-        "type": "uint8"
-      },
-      {
-        "name": "_tokenSymbol",
-        "type": "string"
-      }
-    ],
+    "inputs": [],
+    "payable": false,
     "type": "constructor"
   },
   {
-    "payable": false,
+    "payable": true,
     "type": "fallback"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "_from",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "_value",
+        "type": "uint256"
+      }
+    ],
+    "name": "TokenCreation",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "_to",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "_value",
+        "type": "uint256"
+      }
+    ],
+    "name": "TokenDestruction",
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -268,5 +281,5 @@ module.exports = [
     ],
     "name": "Approval",
     "type": "event"
-  },
+  }
 ]
