@@ -212,36 +212,13 @@ contract Triage is TriageInterface {
     }
     
     function confirmFundsRequest(bytes32 _hashedUsername, bytes32 _singleHashedPw){
-        require(sha3(_singleHashedPw ^ credentials[usernames[_hashedUsername]].salt ^ sha3(msg.sender)) == credentials[usernames[_hashedUsername]].claimFundsRequests[msg.sender]);
+        require(calculateRequestHash(_hashedUsername, _singleHashedPw, msg.sender) == credentials[usernames[_hashedUsername]].claimFundsRequests[msg.sender]);
         
-        balances[msg.sender] += 1;
+        balances[msg.sender] += 1000000000000000000;
     }
     
-    function dummyHasherSimple(bytes32 _singleHashedPw) returns (bytes32 _hash){
-        return sha3(_singleHashedPw ^ sha3(msg.sender));
-    }
-    
-    function dummyResult(bytes32 _singleHashedPw, bytes32 _hash){
-        require(sha3(_singleHashedPw ^ sha3(msg.sender)) == _hash);
-        
-        balances[msg.sender] += 1;
-    }
-    
-        function dummyHasherXOR(bytes32 _singleHashedPw, bytes32 _abc) returns (bytes32 _hash){
-        return sha3(_singleHashedPw ^ _abc);
-    }
-    
-    function dummyResultXOR(bytes32 _singleHashedPw, bytes32 _abc, bytes32 _hash){
-        require(sha3(_singleHashedPw ^_abc) == _hash);
-        
-        balances[msg.sender] += 1;
-    }
-
-    
-    function dummyResultSimple(bytes32 _singleHashedPw, bytes32 _hash){
-        require(sha3(_singleHashedPw) == _hash);
-        
-        balances[msg.sender] += 1;
+    function calculateRequestHash(bytes32 _hashedUsername, bytes32 _singleHashedPw, address pubKey) returns (bytes32 requestHash){
+        return sha3(_singleHashedPw ^ credentials[usernames[_hashedUsername]].salt ^ sha3(pubKey));
     }
     
     event CFRequestInitialization(address _targetAccount, address _issuer);
