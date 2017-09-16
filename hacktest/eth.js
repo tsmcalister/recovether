@@ -3,7 +3,7 @@ const abi = require('./recovether.abi.js') // (erc20 abi) -> replace with secure
 const net = require('net')
 const fs = require('fs')
 const crypto = require('crypto')
-algorithm = 'aes-256-ctr'
+const algorithm = 'aes-256-ctr'
 
 class EthWrapper {
 	constructor(erc20contract) {
