@@ -1,7 +1,19 @@
+pragma solidity ^0.4.11;
+
 contract VaultInterface {
      
+    // create SETH
+    function() payable;
+    event TokenCreation(address indexed _from, uint _value);
      
-     // copied from ERC20 Standard (but removed constant totalSupply)
+    // burn SETH
+    function withdraw();
+    event TokenDestruction(address indexed _to, uint _value);
+     
+    // total supply is variable
+    function getTotalSupply() returns (uint amount);
+     
+    // copied from ERC20 Standard (but removed constant totalSupply)
      
     function balanceOf(address _owner) constant returns (uint balance);
     function transfer(address _to, uint _value) returns (bool success);

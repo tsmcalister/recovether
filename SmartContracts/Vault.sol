@@ -7,6 +7,40 @@ contract Vault is VaultInterface {
     string public constant name = "Secure Ether";
     string public constant symbol = "SETH";
     uint8 public constant decimals = 18;  // similar to Ether
+    uint256 public totalSupply; // variable
+    
+    // generate contract 
+    function Vault(){
+        totalSupply = 0;
+    }
+    
+    // ====== create and burn SETH ====== //
+    
+    // create SETH
+    function() payable{
+        balances[msg.sender] += msg.value;
+        totalSupply += msg.value;
+        
+        TokenCreation(msg.sender, _amount);
+    }
+     
+     // burn SETH
+     function withdraw(uint256 _amount){
+         if(_amount > balances[msg.sender]){
+             throw;
+         }
+         balances[msg.sender] -= _amount;
+         totalSupply -= _amount;
+         Transfer(msg.sender, _amount);
+         
+         msg.sender.transer(amount);
+     }
+     
+    function getTotalSupply() returns (uint256 balance) {
+        return totalSupply;
+    }
+     
+    // ====== ERC 20 Part ====== //
 
     // Balances for each account
     mapping(address => uint256) balances;
@@ -24,8 +58,11 @@ contract Vault is VaultInterface {
         if (balances[msg.sender] >= _amount 
             && _amount > 0
             && balances[_to] + _amount > balances[_to]) {
+                
             balances[msg.sender] -= _amount;
             balances[_to] += _amount;
+            Transfer(msg.sender, _to, _amount);
+            
             return true;
         } else {
             return false;
@@ -62,6 +99,7 @@ contract Vault is VaultInterface {
     // If this function is called again it overwrites the current allowance with _value.
     function approve(address _spender, uint256 _amount) returns (bool success) {
         allowed[msg.sender][_spender] = _amount;
+        Approval(msg.sender, _spender, _amount);
         return true;
     }
     
