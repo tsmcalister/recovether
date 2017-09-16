@@ -57,6 +57,14 @@ class InputForm extends Component {
 	@computed
 	get isButtonDisabled() {
 		const { login, password, newPassword } = this.initial
+		if (!this.props.needNew) {
+			if (login || password) {
+				return true
+			} else {
+				return !(this.isLoginOK && this.isPasswordOK)
+			}
+		}
+
 		if (login || password || newPassword) {
 			return true
 		} else {
