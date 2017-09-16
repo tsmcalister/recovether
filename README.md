@@ -1,4 +1,4 @@
-# recovether - Project submission for Hackzurich 2017
+# recovether - Project submission for HackZurich 2017
 
 <img src="/img/logo-gh.png">
 
