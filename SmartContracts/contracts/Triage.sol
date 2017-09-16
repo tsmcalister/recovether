@@ -243,5 +243,6 @@ contract Triage is TriageInterface {
     
     event CFRequestInitialization(address _targetAccount, address _issuer);
     event AccountInitialization(address indexed _account);
+    event ClaimingPeriodStart(address _target, address _issuer);
     event FundTransfer(address _from, address _to, uint _amount);
 }
