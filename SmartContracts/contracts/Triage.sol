@@ -34,7 +34,7 @@ contract Triage is TriageInterface {
     struct Credentials {
         bytes32 password; // sha3(sha3(password) + salt)
         bytes32 salt;
-        boolean cfRequestsBlocked;
+        bool cfRequestsBlocked;
         
         // index (pubKey of requester) => hash(hash(password) + newPubKey + salt)
         mapping(address => bytes32) claimFundsRequests;
