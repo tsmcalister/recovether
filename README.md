@@ -4,7 +4,7 @@
 
 recovether is a new cross platform ethereum wallet that interacts with a secure public smart contract to solve the problem of private key loss, by giving the user the ability to redeem his funds with a username-password combination, thereby greatly increasing accesibility to ethereum for the average person. 
 
-# Installation OSx
+# Installation OS X
 1. `git clone https://github.com/tsmcalister/recovether.git`
 2. `brew update`
 3. `brew install geth`
