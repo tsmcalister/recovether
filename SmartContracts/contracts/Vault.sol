@@ -17,7 +17,7 @@ contract Vault is VaultInterface {
     }
     
     // PubKey => Security related data
-    mapping(address => Credentials) usernames;
+    mapping(address => Credentials) credentials;
     
     // hash(username) => pubKeys   // used for looking up which PubKey belongs to username, like a DNS
     mapping(uint256 => address) usernames;
