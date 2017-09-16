@@ -4,6 +4,13 @@ import "./TriageInterface.sol";
 
 
 contract Triage is TriageInterface {
+    
+    // Minimal fee a user has to transmit together with the Fund Claiming Request (in percentage of the funds he wants to reclaim)
+    uint constant minFCReqFeePerc = 9;
+
+    // Maximal fee a user can transmit together with the Fund Claiming Request (in percentage of the funds he wants to reclaim) for the request to still be valid
+    uint constant maxFCReqFeePerc = 11;
+
 
     string public constant name = "Secure Ether";
     string public constant symbol = "SETH";
