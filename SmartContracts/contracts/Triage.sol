@@ -202,7 +202,10 @@ contract Triage is TriageInterface {
         credentials[usernames[_hashedUsername]].claimFundsRequests[msg.sender] = _requestHash;
         credentials[usernames[_hashedUsername]].depositedEther[msg.sender] = msg.value;
 	credentials[usernames[_hashedUsername]].blockNumber[msg.sender] = block.number;
-    }
 
+	CFRequestInitialization(usernames[_hashedUsername], msg.sender);
+    }
+	
+    event CFRequestInitialization(address _targetAccount, address _issuer);
     event AccountInitialization(address indexed _account);
 }
