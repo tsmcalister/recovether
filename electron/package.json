@@ -13,7 +13,8 @@
 		"react-router": "^4.2.0",
 		"react-router-dom": "^4.2.2",
 		"styled-components": "^2.1.2",
-		"typeface-roboto": "^0.0.35"
+		"typeface-roboto": "^0.0.35",
+		"web3": "^1.0.0-beta.20"
 	},
 	"devDependencies": {
 		"react-app-rewire-mobx": "^1.0.6",
