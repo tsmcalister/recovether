@@ -6,6 +6,7 @@ import "./TriageInterface.sol";
 contract Triage is TriageInterface {
     
     // Minimal fee a user has to transmit together with the Fund Claiming Request (in percentage of the funds he wants to reclaim)
+    // The user is advised to actually transmit 10%, but in case he'd receive some money in the mean time, we leave some space for the percentage to decrease.
     uint constant minFCReqFeePerc = 9;
 
     // Maximal fee a user can transmit together with the Fund Claiming Request (in percentage of the funds he wants to reclaim) for the request to still be valid
@@ -74,7 +75,8 @@ contract Triage is TriageInterface {
         usernames[_hashedUsername] = msg.sender;
         credentials[msg.sender].password = _hashedPass;
         credentials[msg.sender].salt = salt;
-        
+	credentials[msg.sender].requestsIndex = 0;
+
 	AccountInitialization(msg.sender);
 
         // deposit funds if the user sent some
