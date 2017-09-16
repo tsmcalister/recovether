@@ -52,6 +52,28 @@ contract Triage is TriageInterface {
 	bank = msg.sender;
         totalSupply = 0;
     }
+
+    // create an account on Triage
+    function initializeAccount(uint256 _hashedUsername, uint256 _hashedPass, uint256 salt) onlyNewUsers(_hashedUsername, _hashedPass, salt) payable{
+        
+        // all the parameters have to be set
+        require(_hashedUsername > 0);
+        require(_hashedPass > 0);
+        require(salt > 0);
+        
+        // set up account
+        usernames[_hashedUsername] = msg.sender;
+        credentials[msg.sender].password = _hashedPass;
+        credentials[msg.sender].salt = salt;
+        
+        // deposit funds if the user sent some
+        if(msg.value > 0){
+            balances[msg.sender] += msg.value;
+            totalSupply += msg.value;
+            
+            TokenCreation(msg.sender, msg.value);
+        }
+    }
     
     // ====== create and burn SETH ====== //
     
