@@ -78,10 +78,7 @@ contract Triage is TriageInterface {
     // ====== create and burn SETH ====== //
     
     // create SETH
-    function() payable{
-
-	// calling this function (without any parameters) is only allowed if the user has already setup his account on the Triage 
-        require(credentials[msg.sender].password > 0);
+    function() onlyRegisteredUsers payable{
 
         balances[msg.sender] += msg.value;
         totalSupply += msg.value;
