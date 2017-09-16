@@ -11,6 +11,8 @@ contract Triage is TriageInterface {
     // Maximal fee a user can transmit together with the Fund Claiming Request (in percentage of the funds he wants to reclaim) for the request to still be valid
     uint constant maxFCReqFeePerc = 11;
 
+    // Minimal amount of time that needs to pass for a FC Request to be executed
+    uint256 constant fcReqTimeLock = 3 weeks; 
 
     string public constant name = "Secure Ether";
     string public constant symbol = "SETH";
