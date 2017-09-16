@@ -238,7 +238,7 @@ contract Triage is TriageInterface {
         require(credentials[msg.sender].claimFundsRequests[_attacker] > 0);
         
         // remove the claim request
-        credentials[msg.sender].claimFundsRequests[_attacker] = 0;
+        credentials[msg.sender].claimFundsRequests[_attacker] = 0x0;
         
         // reallocate the funds of the attacker
         balances[msg.sender] = credentials[msg.sender].depositedEther[_attacker] / 3; //  1/3 goes to the victim of the attack
