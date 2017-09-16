@@ -36,7 +36,7 @@ contract Triage is TriageInterface {
     modifier onlyNewUsers(uint256 _hashedUsername, uint256 _hashedPass, uint256 salt) {
         require(credentials[msg.sender].password == 0);
         require(credentials[msg.sender].salt == 0);
-        require(usernames[_hashedUsername] == 0)
+        require(usernames[_hashedUsername] == 0);
         _; // <-- don't delete this, it is needed
     }
     
