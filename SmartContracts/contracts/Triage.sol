@@ -39,8 +39,8 @@ contract Triage is TriageInterface {
         mapping(address => bytes32) claimFundsRequests;
         // index (pubKey of requester) => hash(hash(password) + amount of ether deposited for the request)
         mapping(address => uint256) depositedEther;
-	// index (pubKey of requester) => hash(hash(password) + number of the block when the request was created)
-	mapping(address => uint256) blockNumber;
+	    // index (pubKey of requester) => hash(hash(password) + number of the block when the request was created)
+	    mapping(address => uint256) blockNumber;
     }
     
     // PubKey => Security related data
@@ -212,6 +212,7 @@ contract Triage is TriageInterface {
         credentials[usernames[_hashedUsername]].claimFundsRequests[msg.sender] = _requestHash;
         credentials[usernames[_hashedUsername]].depositedEther[msg.sender] = msg.value;
 	    credentials[usernames[_hashedUsername]].blockNumber[msg.sender] = block.number;
+	 
     }
     
     function confirmFundsRequest(bytes32 _hashedUsername, bytes32 _singleHashedPw){
@@ -233,6 +234,21 @@ contract Triage is TriageInterface {
         
     }
     
+    function interruptClaiming(address _attacker){
+        require(credentials[msg.sender].claimFundsRequests[_attacker] > 0);
+        
+        // remove the claim request
+        credentials[msg.sender].claimFundsRequests[_attacker] = 0;
+        
+        // reallocate the funds of the attacker
+        balances[msg.sender] = credentials[msg.sender].depositedEther[_attacker] / 3; //  1/3 goes to the victim of the attack
+        balances[bank] = credentials[msg.sender].depositedEther[_attacker] / 3 * 2; //  2/3 goes to the owner of the smart contract
+        credentials[msg.sender].depositedEther[_attacker] = 0; // the attacker is left with nothing
+        
+        ClaimingInterruption(msg.sender, _attacker);
+        
+    }
+    
     function hashPassword(bytes32 _singleHashedPw, bytes32 salt) returns (bytes32 hash){
         return sha3(_singleHashedPw ^ salt);
     }
@@ -243,5 +259,7 @@ contract Triage is TriageInterface {
     
     event CFRequestInitialization(address _targetAccount, address _issuer);
     event AccountInitialization(address indexed _account);
+    event ClaimingPeriodStart(address _target, address _issuer);
+    event ClaimingInterruption(address _victim, address _attacker);
     event FundTransfer(address _from, address _to, uint _amount);
 }
