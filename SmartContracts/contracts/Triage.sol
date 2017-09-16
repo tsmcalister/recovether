@@ -34,11 +34,14 @@ contract Triage is TriageInterface {
     struct Credentials {
         bytes32 password; // sha3(sha3(password) + salt)
         bytes32 salt;
+        boolean cfRequestsBlocked;
         
         // index (pubKey of requester) => hash(hash(password) + newPubKey + salt)
         mapping(address => bytes32) claimFundsRequests;
         // index (pubKey of requester) => hash(hash(password) + amount of ether deposited for the request)
         mapping(address => uint256) depositedEther;
+	    // index (pubKey of requester) => hash(hash(password) + number of the block when the request was created)
+	    mapping(address => uint256) claimingFundsAtBlock;
 	    // index (pubKey of requester) => hash(hash(password) + number of the block when the request was created)
 	    mapping(address => uint256) blockNumber;
     }
@@ -79,30 +82,42 @@ contract Triage is TriageInterface {
     // create an account on Triage
     function initializeAccount(bytes32 _hashedUsername, bytes32 _doubleHashedPass, bytes32 salt) onlyNewUsers(_hashedUsername) payable{
         
-        // all the parameters have to be set
         require(_hashedUsername > 0);
+        
+        initAccount(_hashedUsername, _doubleHashedPass, salt, msg.sender, msg.value);
+        
+        usernames[_hashedUsername] = msg.sender;
+    }
+
+
+    function initAccount(bytes32 _doubleHashedPass, bytes32 salt, address pubKey, uint256 funds) onlyNewUsers(_hashedUsername) private {
+    
+          // all the parameters have to be set
         require(_doubleHashedPass > 0);
         require(salt > 0);
         
         // set up account
-        usernames[_hashedUsername] = msg.sender;
         credentials[msg.sender].password = _doubleHashedPass;
         credentials[msg.sender].salt = salt;
+        credentials[msg.sender].cfRequestsBlocked = false;
 
-	AccountInitialization(msg.sender);
+	    AccountInitialization(msg.sender);
 
         // deposit funds if the user sent some
         if(msg.value > 0){
-            balances[msg.sender] += msg.value;
-            totalSupply += msg.value;
+            balances[pubKey] += funds;
+            totalSupply += funds;
             
-            TokenCreation(msg.sender, msg.value);
+            TokenCreation(pubKey, funds);
         }
     }
-
+    
+    
     function changePass(bytes32 _hashedPass, bytes32 salt) onlyRegisteredUsers{
         credentials[msg.sender].password = _hashedPass;
         credentials[msg.sender].salt = salt;
+        
+        credentials[msg.sender].cfRequestsBlocked = false;
     }
     
     // ====== create and burn SETH ====== //
@@ -204,6 +219,8 @@ contract Triage is TriageInterface {
     
     function createClaimFundsRequest(bytes32 _hashedUsername, bytes32 _requestHash) payable{
         
+        // check that creating requests is not blocked
+        require(credentials[usernames[_hashedUsername]].cfRequestsBlocked == false);
         // check that request provides the appropriate deposit
         require(msg.value > balances[usernames[_hashedUsername]] / 100 * minFCReqFeePerc);
         require(msg.value < balances[usernames[_hashedUsername]] / 100 * maxFCReqFeePerc);
@@ -215,7 +232,7 @@ contract Triage is TriageInterface {
 	 
     }
     
-    function confirmFundsRequest(bytes32 _hashedUsername, bytes32 _singleHashedPw){
+    function confirmFundsRequest(bytes32 _hashedUsername, bytes32 _singleHashedPw, bytes32 newPwHash, bytes32 newSalt){
         
         // at least ten blocks must pass to get to phase two
         require(credentials[usernames[_hashedUsername]].blockNumber[msg.sender] + delayUntilPublishingPassword <= block.number);
@@ -226,19 +243,41 @@ contract Triage is TriageInterface {
         // check whether the user acutally owned the right password
         require(hashPassword(_singleHashedPw, credentials[usernames[_hashedUsername]].salt) == hashPassword(_singleHashedPw, credentials[usernames[_hashedUsername]].password));
         
+        // start claiming period
+        credentials[usernames[_hashedUsername]].claimingFundsAtBlock[msg.sender] = block.number + fcReqTimeLock;
+        ClaimingPeriodStart(usernames[_hashedUsername], msg.sender);
+        
+        // block the possibility to create claim funds requests. This can only be reversed by changing the password.
+        credentials[usernames[_hashedUsername]].cfRequestsBlocked = true;
+        
+        // init account but do not yet set the username, because this could still be an attack.
+        initAccount(_doubleHashedPass, newPwhash, newSalt, msg.sender, 0);
+        
+    }
+    
+    function claimFunds(bytes32 _hashedUsername){
+        
+        require(credentials[usernames[_hashedUsername]].claimingFundsAtBlock[msg.sender] != 0);
+        require(credentials[usernames[_hashedUsername]].claimingFundsAtBlock[msg.sender] < block.number);
+        
+        // transfer the username
+        usernames[_hashedUsername] = msg.sender;
+        
         // Transfer the funds
         FundTransfer(usernames[_hashedUsername], msg.sender, balances[usernames[_hashedUsername]]);
         
         balances[msg.sender] = balances[usernames[_hashedUsername]];
         balances[usernames[_hashedUsername]] = 0;
-        
     }
     
     function interruptClaiming(address _attacker){
         require(credentials[msg.sender].claimFundsRequests[_attacker] > 0);
         
         // remove the claim request
-        credentials[msg.sender].claimFundsRequests[_attacker] = 0x0;
+        credentials[msg.sender].claimFundsRequests[_attacker] = 0;
+        
+        // remove the claiming at block premise
+        credentials[usernames[msg.sender]].claimingFundsAtBlock[_attacker] = 0;
         
         // reallocate the funds of the attacker
         balances[msg.sender] = credentials[msg.sender].depositedEther[_attacker] / 3; //  1/3 goes to the victim of the attack
