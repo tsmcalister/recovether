@@ -13,7 +13,7 @@ const Wrapper = styled.div`
 	width: 80%;
 `
 
-const StyledButton = styled(Button)`margin-top: 15px;`
+const ButtonWrapper = styled.div`margin-top: 10px;`
 
 @observer
 class InputForm extends Component {
@@ -162,14 +162,16 @@ class InputForm extends Component {
 						)}
 					</FormControl>
 				)}
-				<StyledButton
-					raised
-					color="primary"
-					onClick={this.handleSubmit}
-					disabled={this.isButtonDisabled}
-				>
-					Next
-				</StyledButton>
+				<ButtonWrapper>
+					<Button
+						raised
+						color="primary"
+						onClick={this.handleSubmit}
+						disabled={this.isButtonDisabled}
+					>
+						Next
+					</Button>
+				</ButtonWrapper>
 			</Wrapper>
 		)
 	}

@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import Snackbar from 'material-ui/Snackbar'
 import IconButton from 'material-ui/IconButton'
 import CloseIcon from 'material-ui-icons/Close'
+import Typography from 'material-ui/Typography'
 
 import { observable, action } from 'mobx'
 import { inject, observer } from 'mobx-react'
@@ -21,6 +22,12 @@ const Wrapper = styled.div`
 const StyledWrapper = styled(Wrapper)`
 	justify-content: center;
 	height: 100%;
+`
+
+const TextWrapper = styled.div`
+	width: 80%;
+	display: flex;
+	flex-direction: column;
 `
 
 @inject('api', 'auth')
@@ -61,6 +68,22 @@ class LoginWithPassword extends Component {
 		return (
 			<StyledWrapper>
 				<Wrapper>
+					<TextWrapper>
+						<Typography type="headline">Important tips:</Typography>
+						<Typography type="subheading">
+							<ul>
+								<li>Your password's hash would be public</li>
+								<li>
+									Your old password would become public after
+									funds retrieval
+								</li>
+								<li>
+									Consider making your new password strong and
+									unique
+								</li>
+							</ul>
+						</Typography>
+					</TextWrapper>
 					<InputForm onSubmit={this.handleSubmit} needNew />
 				</Wrapper>
 				<Snackbar

@@ -6,7 +6,6 @@ import Button from 'material-ui/Button'
 
 import { Route, Switch, Link } from 'react-router-dom'
 
-import AskKeyPassword from './AskKeyPassword'
 import LoginWithPassword from './LoginWithPassword'
 
 const Wrapper = styled.div`
@@ -17,11 +16,15 @@ const Wrapper = styled.div`
 	align-items: center;
 `
 
-const TitleWrapper = styled.div`margin-top: 50px;`
+const TitleWrapper = styled.div`margin-top: 30px;`
 
-const TopButton = styled(Button)`margin-top: 150px;`
-const StyledButton = styled(Button)`margin-top: 15px;`
+const TopButton = styled(Button)`margin-top: 50px;`
+const StyledButton = styled(Button)`margin-top: 20px;`
 const UnstyledLink = styled(Link)`text-decoration: none;`
+const Image = styled.img`
+	width: 30%;
+	margin-top: 20px;
+`
 
 class Login extends Component {
 	render() {
@@ -37,6 +40,7 @@ class Login extends Component {
 									Recovether
 								</Typography>
 							</TitleWrapper>
+							<Image src="/logo.png" />
 							<UnstyledLink to="/login/private-password">
 								<TopButton raised color="accent">
 									I have a private key
@@ -56,10 +60,6 @@ class Login extends Component {
 					)}
 				/>
 				<Route path="/login/password" component={LoginWithPassword} />
-				<Route
-					path="/login/private-password"
-					component={AskKeyPassword}
-				/>
 			</Switch>
 		)
 	}
