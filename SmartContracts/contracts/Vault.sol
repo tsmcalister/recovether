@@ -11,9 +11,13 @@ contract Vault is VaultInterface {
     uint256 public totalSupply; // variable
     address bank;
 
-    struct Credentials {
+        struct Credentials {
         uint256 password; // hash(password + salt)
         uint256 salt;
+        
+        // index => hash(password + newPubKey + salt)
+        mapping(uint256 => uint256) claimFundsRequests;
+        uint256 requestsIndex;
     }
     
     // PubKey => Security related data
