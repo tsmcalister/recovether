@@ -198,10 +198,10 @@ contract Triage is TriageInterface {
         require(msg.value > balances[usernames[_hashedUsername]] / 100 * minFCReqFeePerc);
         require(msg.value < balances[usernames[_hashedUsername]] / 100 * maxFCReqFeePerc);
         
-        // store the request hash
-        credentials[usernames[_hashedUsername]].claimFundsRequests[requestsIndex] = _requestHash;
-        credentials[usernames[_hashedUsername]].depositedEther[requestsIndex] = msg.value;
-        credentials[usernames[_hashedUsername]].requestsIndex ++;
+        // store the request hash  #spaghettiCodeParty
+        credentials[usernames[_hashedUsername]].claimFundsRequests[credentials[usernames[_hashedUsername]].requestsIndex] = _requestHash;
+        credentials[usernames[_hashedUsername]].depositedEther[credentials[usernames[_hashedUsername]].requestsIndex] = msg.value;
+	credentials[usernames[_hashedUsername]].requestsIndex ++;
     }
 
     event AccountInitialization(address indexed _account);
