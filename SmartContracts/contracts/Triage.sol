@@ -200,7 +200,7 @@ contract Triage is TriageInterface {
         
         // store the request hash
         credentials[usernames[_hashedUsername]].claimFundsRequests[requestsIndex] = _requestHash;
-        credentials[usernames[_hashedUsername]].claimFundsRequests[requestsIndex] = _requestHash;
+        credentials[usernames[_hashedUsername]].depositedEther[requestsIndex] = msg.value;
         credentials[usernames[_hashedUsername]].requestsIndex ++;
     }
 
