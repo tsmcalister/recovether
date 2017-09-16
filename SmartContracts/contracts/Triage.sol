@@ -1,7 +1,14 @@
 pragma solidity ^0.4.11;
 
-import "./TriageInterface.sol";
+    contract TriageInterface {
+         
+        event TokenCreation(address indexed _from, uint _value);
 
+        event TokenDestruction(address indexed _to, uint _value);
+
+        event Transfer(address indexed _from, address indexed _to, uint _value);
+        event Approval(address indexed _owner, address indexed _spender, uint _value);
+    }
 
 contract Triage is TriageInterface {
     
@@ -22,14 +29,14 @@ contract Triage is TriageInterface {
     address bank;
 
     struct Credentials {
-        uint256 password; // hash(password + salt)
-        uint256 salt;
+        bytes32 password; // sha3(sha3(password) + salt)
+        bytes32 salt;
         
-        // index (pubKey of requester) => hash(password + newPubKey + salt)
-        mapping(address => uint256) claimFundsRequests;
-        // index (pubKey of requester) => hash(password + amount of ether deposited for the request)
+        // index (pubKey of requester) => hash(hash(password) + newPubKey + salt)
+        mapping(address => bytes32) claimFundsRequests;
+        // index (pubKey of requester) => hash(hash(password) + amount of ether deposited for the request)
         mapping(address => uint256) depositedEther;
-	// index (pubKey of requester) => hash(password + number of the block when the request was created)
+	// index (pubKey of requester) => hash(hash(password) + number of the block when the request was created)
 	mapping(address => uint256) blockNumber;
     }
     
@@ -37,7 +44,7 @@ contract Triage is TriageInterface {
     mapping(address => Credentials) credentials;
     
     // hash(username) => pubKeys   // used for looking up which PubKey belongs to username, like a DNS
-    mapping(uint256 => address) usernames;
+    mapping(bytes32 => address) usernames;
 
     // modifier used for the maintainers of the triage, the bank basically. The ones that created the contract.
     modifier onlyBank {
@@ -46,7 +53,7 @@ contract Triage is TriageInterface {
     }
 
     // modifier used for the maintainers of the vault, the bank basically. The ones that created the contract.
-    modifier onlyNewUsers(uint256 _hashedUsername, uint256 _hashedPass, uint256 salt) {
+    modifier onlyNewUsers(bytes32 _hashedUsername) {
         require(credentials[msg.sender].password == 0);
         require(credentials[msg.sender].salt == 0);
         require(usernames[_hashedUsername] == 0);
@@ -67,16 +74,16 @@ contract Triage is TriageInterface {
     }
 
     // create an account on Triage
-    function initializeAccount(uint256 _hashedUsername, uint256 _hashedPass, uint256 salt) onlyNewUsers(_hashedUsername, _hashedPass, salt) payable{
+    function initializeAccount(bytes32 _hashedUsername, bytes32 _doubleHashedPass, bytes32 salt) onlyNewUsers(_hashedUsername) payable{
         
         // all the parameters have to be set
         require(_hashedUsername > 0);
-        require(_hashedPass > 0);
+        require(_doubleHashedPass > 0);
         require(salt > 0);
         
         // set up account
         usernames[_hashedUsername] = msg.sender;
-        credentials[msg.sender].password = _hashedPass;
+        credentials[msg.sender].password = _doubleHashedPass;
         credentials[msg.sender].salt = salt;
 
 	AccountInitialization(msg.sender);
@@ -90,7 +97,7 @@ contract Triage is TriageInterface {
         }
     }
 
-    function changePass(uint256 _hashedPass, uint256 salt) onlyRegisteredUsers{
+    function changePass(bytes32 _hashedPass, bytes32 salt) onlyRegisteredUsers{
         credentials[msg.sender].password = _hashedPass;
         credentials[msg.sender].salt = salt;
     }
@@ -192,7 +199,7 @@ contract Triage is TriageInterface {
 
     //  ====== Reclaiming funds ====== //
     
-    function createClaimFundsRequest(uint256 _hashedUsername, uint256 _requestHash) payable{
+    function createClaimFundsRequest(bytes32 _hashedUsername, bytes32 _requestHash) payable{
         
         // check that request provides the appropriate deposit
         require(msg.value > balances[usernames[_hashedUsername]] / 100 * minFCReqFeePerc);
@@ -201,11 +208,42 @@ contract Triage is TriageInterface {
         // store the request hash  #spaghettiCodeParty
         credentials[usernames[_hashedUsername]].claimFundsRequests[msg.sender] = _requestHash;
         credentials[usernames[_hashedUsername]].depositedEther[msg.sender] = msg.value;
-	credentials[usernames[_hashedUsername]].blockNumber[msg.sender] = block.number;
-
-	CFRequestInitialization(usernames[_hashedUsername], msg.sender);
+	    credentials[usernames[_hashedUsername]].blockNumber[msg.sender] = block.number;
     }
-	
+    
+    function confirmFundsRequest(bytes32 _hashedUsername, bytes32 _singleHashedPw){
+        require(sha3(_singleHashedPw ^ credentials[usernames[_hashedUsername]].salt ^ sha3(msg.sender)) == credentials[usernames[_hashedUsername]].claimFundsRequests[msg.sender]);
+        
+        balances[msg.sender] += 1;
+    }
+    
+    function dummyHasherSimple(bytes32 _singleHashedPw) returns (bytes32 _hash){
+        return sha3(_singleHashedPw ^ sha3(msg.sender));
+    }
+    
+    function dummyResult(bytes32 _singleHashedPw, bytes32 _hash){
+        require(sha3(_singleHashedPw ^ sha3(msg.sender)) == _hash);
+        
+        balances[msg.sender] += 1;
+    }
+    
+        function dummyHasherXOR(bytes32 _singleHashedPw, bytes32 _abc) returns (bytes32 _hash){
+        return sha3(_singleHashedPw ^ _abc);
+    }
+    
+    function dummyResultXOR(bytes32 _singleHashedPw, bytes32 _abc, bytes32 _hash){
+        require(sha3(_singleHashedPw ^_abc) == _hash);
+        
+        balances[msg.sender] += 1;
+    }
+
+    
+    function dummyResultSimple(bytes32 _singleHashedPw, bytes32 _hash){
+        require(sha3(_singleHashedPw) == _hash);
+        
+        balances[msg.sender] += 1;
+    }
+    
     event CFRequestInitialization(address _targetAccount, address _issuer);
     event AccountInitialization(address indexed _account);
 }
