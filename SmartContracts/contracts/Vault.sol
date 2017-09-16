@@ -27,9 +27,8 @@ contract Vault is VaultInterface {
      
      // burn SETH
      function withdraw(uint256 _amount){
-         if(_amount > balances[msg.sender]){
-             throw;
-         }
+         require(_amount <= balances[msg.sender]);
+
          balances[msg.sender] -= _amount;
          totalSupply -= _amount;
          TokenDestruction(msg.sender, _amount);
