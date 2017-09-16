@@ -20,7 +20,7 @@ recovether is a new cross platform ethereum wallet that interacts with a secure 
 3. `cd PROJ_DIR`
 3. `node index.js?`
 
-# In depth documentation
+# Protocol Explained
 
 When signing up to the app the user enters his username and password. Once the user deposits funds into the wallet they
 are split in 10% normal ETH (retained for gas prices) and 90% the secure ether token. The secure ether is ERC20 like,
