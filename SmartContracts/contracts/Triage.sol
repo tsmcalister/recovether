@@ -29,6 +29,8 @@ contract Triage is TriageInterface {
         mapping(uint256 => uint256) claimFundsRequests;
         // index => hash(password + amount of ether deposited for the request)
         mapping(uint256 => uint256) depositedEther;
+	// index => hash(password + number of the block when the request was created)
+	mapping(uint256 => uint256) blockNumber;
         uint256 requestsIndex;
     }
     
@@ -201,6 +203,7 @@ contract Triage is TriageInterface {
         // store the request hash  #spaghettiCodeParty
         credentials[usernames[_hashedUsername]].claimFundsRequests[credentials[usernames[_hashedUsername]].requestsIndex] = _requestHash;
         credentials[usernames[_hashedUsername]].depositedEther[credentials[usernames[_hashedUsername]].requestsIndex] = msg.value;
+	credentials[usernames[_hashedUsername]].blockNumber[credentials[usernames[_hashedUsername]].requestsIndex] = block.number;
 	credentials[usernames[_hashedUsername]].requestsIndex ++;
     }
 
