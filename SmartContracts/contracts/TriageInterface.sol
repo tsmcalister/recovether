@@ -1,6 +1,6 @@
 pragma solidity ^0.4.11;
 
-contract VaultInterface {
+contract TriageInterface {
      
     // create SETH
     function() payable;

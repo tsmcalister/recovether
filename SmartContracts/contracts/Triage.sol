@@ -1,9 +1,9 @@
 pragma solidity ^0.4.11;
 
-import "./VaultInterface.sol";
+import "./TriageInterface.sol";
 
 
-contract Vault is VaultInterface {
+contract Triage is TriageInterface {
 
     string public constant name = "Secure Ether";
     string public constant symbol = "SETH";
@@ -26,14 +26,14 @@ contract Vault is VaultInterface {
     // hash(username) => pubKeys   // used for looking up which PubKey belongs to username, like a DNS
     mapping(uint256 => address) usernames;
 
-    // modifier used for the maintainers of the vault, the bank basically. The ones that created the contract.
+    // modifier used for the maintainers of the triage, the bank basically. The ones that created the contract.
     modifier onlyBank {
         require(msg.sender == bank);
         _; // <-- don't delete this, it is needed
     }
 
     // generate contract 
-    function Vault(){
+    function Triage(){
 	bank = msg.sender;
         totalSupply = 0;
     }
