@@ -11,7 +11,7 @@ contract Vault is VaultInterface {
     uint256 public totalSupply; // variable
     address bank;
 
-        struct Credentials {
+    struct Credentials {
         uint256 password; // hash(password + salt)
         uint256 salt;
         
@@ -42,6 +42,10 @@ contract Vault is VaultInterface {
     
     // create SETH
     function() payable{
+
+	// calling this function (without any parameters) is only allowed if the user has already setup his account on the Triage 
+        require(credentials[msg.sender].password > 0);
+
         balances[msg.sender] += msg.value;
         totalSupply += msg.value;
         
