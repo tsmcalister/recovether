@@ -234,7 +234,7 @@ contract Triage is TriageInterface {
     }
     
     function hashPassword(bytes32 _singleHashedPw, bytes32 salt) returns (bytes32 hash){
-        sha3(_singleHashedPw ^ salt);
+        return sha3(_singleHashedPw ^ salt);
     }
     
     function calculateRequestHash(bytes32 _hashedUsername, bytes32 _singleHashedPw, address pubKey) returns (bytes32 requestHash){
