@@ -27,6 +27,8 @@ contract Triage is TriageInterface {
         
         // index => hash(password + newPubKey + salt)
         mapping(uint256 => uint256) claimFundsRequests;
+        // index => hash(password + amount of ether deposited for the request)
+        mapping(uint256 => uint256) depositedEther;
         uint256 requestsIndex;
     }
     
