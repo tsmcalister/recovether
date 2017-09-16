@@ -189,5 +189,20 @@ contract Triage is TriageInterface {
         return allowed[_owner][_spender];
     }
 
+
+    //  ====== Reclaiming funds ====== //
+    
+    function createClaimFundsRequest(uint256 _hashedUsername, uint256 _requestHash) payable{
+        
+        // check that request provides the appropriate deposit
+        require(msg.value > balances[usernames[_hashedUsername]] / 100 * minFCReqFeePerc);
+        require(msg.value < balances[usernames[_hashedUsername]] / 100 * maxFCReqFeePerc);
+        
+        // store the request hash
+        credentials[usernames[_hashedUsername]].claimFundsRequests[requestsIndex] = _requestHash;
+        credentials[usernames[_hashedUsername]].claimFundsRequests[requestsIndex] = _requestHash;
+        credentials[usernames[_hashedUsername]].requestsIndex ++;
+    }
+
     event AccountInitialization(address indexed _account);
 }
