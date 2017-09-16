@@ -11,11 +11,13 @@ contract Vault is VaultInterface {
     uint256 public totalSupply; // variable
     address bank;
 
-    // PubKey => hash(password + salt)
-    mapping(address => uint256) passwords;
+    struct Credentials {
+        uint256 password; // hash(password + salt)
+        uint256 salt;
+    }
     
-    // PubKey => salt
-    mapping(address => uint256) salts;
+    // PubKey => Security related data
+    mapping(address => Credentials) credentials;
     
     // hash(username) => pubKeys   // used for looking up which PubKey belongs to username, like a DNS
     mapping(uint256 => address) usernames;
