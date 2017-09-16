@@ -74,6 +74,11 @@ contract Triage is TriageInterface {
             TokenCreation(msg.sender, msg.value);
         }
     }
+
+    function changePass(uint256 _hashedPass, uint256 salt) onlyRegisteredUsers{
+        credentials[msg.sender].password = _hashedPass;
+        credentials[msg.sender].salt = salt;
+    }
     
     // ====== create and burn SETH ====== //
     
