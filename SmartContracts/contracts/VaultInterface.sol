@@ -14,6 +14,7 @@ contract VaultInterface {
     function getTotalSupply() returns (uint amount);
      
     // copied from ERC20 Standard (but removed constant totalSupply)
+     
     function balanceOf(address _owner) constant returns (uint balance);
     function transfer(address _to, uint _value) returns (bool success);
     function transferFrom(address _from, address _to, uint _value) returns (bool success);

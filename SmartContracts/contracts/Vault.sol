@@ -1,6 +1,7 @@
 pragma solidity ^0.4.11;
 
-import "VaultInterface.sol";
+import "./VaultInterface.sol";
+
 
 contract Vault is VaultInterface {
 
@@ -8,17 +9,9 @@ contract Vault is VaultInterface {
     string public constant symbol = "SETH";
     uint8 public constant decimals = 18;  // similar to Ether
     uint256 public totalSupply; // variable
-    address bank;
-    
-    // modifier used for the maintainers of the vault, the bank basically. The ones that created the contract.
-    modifier onlyBank {
-        require(msg.sender == bank);
-        _; // <-- don't delete this, it is needed
-    }
     
     // generate contract 
     function Vault(){
-        bank = msg.sender;
         totalSupply = 0;
     }
     
@@ -29,7 +22,7 @@ contract Vault is VaultInterface {
         balances[msg.sender] += msg.value;
         totalSupply += msg.value;
         
-        TokenCreation(msg.sender, _amount);
+        TokenCreation(msg.sender, msg.value);
     }
      
      // burn SETH
@@ -39,9 +32,9 @@ contract Vault is VaultInterface {
          }
          balances[msg.sender] -= _amount;
          totalSupply -= _amount;
-         Transfer(msg.sender, _amount);
+         TokenDestruction(msg.sender, _amount);
          
-         msg.sender.transer(amount);
+         msg.sender.transfer(_amount);
      }
      
     function getTotalSupply() returns (uint256 balance) {
