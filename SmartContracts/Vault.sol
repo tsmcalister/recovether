@@ -8,9 +8,17 @@ contract Vault is VaultInterface {
     string public constant symbol = "SETH";
     uint8 public constant decimals = 18;  // similar to Ether
     uint256 public totalSupply; // variable
+    address bank;
+    
+    // modifier used for the maintainers of the vault, the bank basically. The ones that created the contract.
+    modifier onlyBank {
+        require(msg.sender == bank);
+        _; // <-- don't delete this, it is needed
+    }
     
     // generate contract 
     function Vault(){
+        bank = msg.sender;
         totalSupply = 0;
     }
     
