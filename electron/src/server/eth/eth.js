@@ -4,6 +4,7 @@ const net = require('net')
 const fs = require('fs')
 const crypto = require('crypto')
 const algorithm = 'aes-256-ctr'
+const BigNumber = require('bignumber.js')
 
 class EthWrapper {
 	constructor(erc20contract) {
@@ -67,7 +68,7 @@ class EthWrapper {
 				if (err) {
 					reject(err)
 				} else {
-					resolve(buf)
+					resolve(buf.toString('hex'))
 				}
 			})
 		)
@@ -144,23 +145,32 @@ class EthWrapper {
     }
     */
 
-	initializeAccount(username, password, amount) {
+	async initializeAccount(username, password, amount) {
 		//CREATE SALT HERE
-		return this.createSalt().then(salt => {
-			const usernameHash = this.web3.utils.soliditySha3(username)
-			const passwordHash = this.web3.utils.soliditySha3(
-				password + salt.toString()
-			)
-			console.log(usernameHash + '\n' + passwordHash)
+		const salt = await this.createSalt()
+
+		const usernameHash = this.web3.utils.soliditySha3(username)
+		const passwordHash = this.web3.utils.soliditySha3(
+			password + salt.toString()
+		)
+		console.log(usernameHash + '\n' + passwordHash)
+		console.log(parseInt(amount * Math.pow(10, 18), 10))
+		const num = parseInt(amount * Math.pow(10, 18), 10)
+		const bignum = new BigNumber(num.toString())
+		console.log(bignum)
+
+		try {
 			return this.recovether.methods
 				.initializeAccount(usernameHash, passwordHash, salt.toString())
 				.send({
 					to: this.recovether._address,
 					from: this.web3.eth.accounts.wallet[0].address,
 					gas: this.gasLimit,
-					value: amount * Math.pow(10, 18)
+					value: bignum
 				})
-		})
+		} catch (err) {
+			console.log(err)
+		}
 	}
 
 	changePass(newPassword, salt) {

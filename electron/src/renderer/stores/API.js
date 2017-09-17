@@ -50,6 +50,16 @@ export class API {
 		})
 	}
 
+	async initializeAccount({ username, password, amount }) {
+		const res = await this.send('initializeAccount', {
+			username,
+			password,
+			amount
+		})
+		console.log(res)
+		return res
+	}
+
 	logIn(login, password) {
 		// throw new Error('Unable to log in')
 	}

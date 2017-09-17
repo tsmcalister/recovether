@@ -32,6 +32,13 @@ wss.on('connection', ws => {
 					newPassword
 				)
 				break
+			case 'initializeAccount':
+				res = await eth.initializeAccount(
+					message.value.username,
+					message.value.password,
+					message.value.amount
+				)
+				break
 		}
 		respond(ws, message, res)
 	})
