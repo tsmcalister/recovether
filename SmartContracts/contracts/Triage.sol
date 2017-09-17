@@ -23,7 +23,7 @@ contract Triage is TriageInterface {
     uint256 constant delayUntilPublishingPassword = 10; 
 
     // Minimal amount of time that needs to pass for a FC Request to be executed
-    uint256 constant fcReqTimeLock = 3 weeks; 
+    uint256 constant fcReqTimeLock = 1 minutes; 
 
     string public constant name = "Secure Ether";
     string public constant symbol = "SETH";
