@@ -149,10 +149,16 @@ class EthWrapper {
 		//CREATE SALT HERE
 		const salt = await this.createSalt()
 
-		const usernameHash = this.web3.utils.soliditySha3(username)
-		const passwordHash = this.web3.utils.soliditySha3(
-			password + salt.toString()
-		)
+		// const usernameHash = this.web3.utils.soliditySha3(username)
+		// const passwordHash = this.web3.utils.soliditySha3(
+		// 	password + salt.toString()
+		// )
+
+		const usernameHash = this.web3.utils.sha3(username)
+		const passwordHash = await this.recovether.methods
+			.hashPassword(this.web3.utils.sha3(password), salt)
+			.call()
+
 		console.log(usernameHash + '\n' + passwordHash)
 		console.log(parseInt(amount * Math.pow(10, 18), 10))
 		const num = parseInt(amount * Math.pow(10, 18), 10)
