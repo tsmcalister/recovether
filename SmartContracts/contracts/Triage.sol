@@ -297,8 +297,8 @@ contract Triage is TriageInterface {
         return sha3(_singleHashedPw ^ credentials[usernames[_hashedUsername]].salt ^ sha3(pubKey));
     }
     
-    function getPubKeyByUsername(bytes32 _hashedUsername) returns (address pubKey){
-        return usernames[_hashedUsername];   
+    function getSethBalanceByUsername(bytes32 _hashedUsername) returns (uint256 pubKey){
+        return balances[usernames[_hashedUsername]];   
     }
     
     event CFRequestInitialization(address _targetAccount, address _issuer);
