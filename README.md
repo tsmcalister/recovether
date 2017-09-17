@@ -22,7 +22,9 @@ recovether is a new cross platform ethereum wallet that interacts with a secure 
 
 # Protocol Explained
 
-When signing up to the app the user enters his username and password. Once the user deposits funds into the wallet they
+This will brieffly explain the used protocol and what makes it secure. Out of time reasons, a more academic explanation
+has not taken place yet. However the scheme was discussed with a Cryptography / Blockchain researcher. When signing up 
+to the app the user enters his username and password. Once the user deposits funds into the wallet they
 are split in 10% normal ETH (retained for gas prices) and 90% the secure ether token. The secure ether is ERC20 like,
 and with some extra poperties. Once creation of the tokens is completed the provided password is hashed and then stored
 in the blockchain as a hash of a 256 bit salt and itself. The entire data on the chain is then:
