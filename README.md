@@ -20,11 +20,13 @@ recovether is a new cross platform ethereum wallet that interacts with a secure 
 3. `cd PROJ_DIR`
 3. `node index.js?`
 
-# In depth documentation
+# Protocol Explained
 
-When signing up to the app the user enters his username and password. Once the user deposits funds into the wallet they
+This will brieffly explain the used protocol and what makes it secure. Out of time reasons, a more academic explanation
+has not taken place yet. However the scheme was discussed with a Cryptography / Blockchain researcher. When signing up 
+to the app the user enters his username and password. Once the user deposits funds into the wallet they
 are split in 10% normal ETH (retained for gas prices) and 90% the secure ether token. The secure ether is ERC20 like,
-and with some extra poperties. One creation of the tokens the provided password is hashed and then stored
+and with some extra poperties. Once creation of the tokens is completed the provided password is hashed and then stored
 in the blockchain as a hash of a 256 bit salt and itself. The entire data on the chain is then:
 ```
 pubkey | n amount of secure ether | hash(hash(PW) + salt) | salt | hash(username)
@@ -37,7 +39,7 @@ logs back in to the wallet with his passphrase. Once that is done he creates a n
 the amount he wants to rescue. Once he has done that the wallet will ask to change his password. During this process it
 also generates a new key pair. This is the key pair the rescued funds will be sent to. 
 
-He then generates a primary transaction to prove that has a secret s. In fact that secret is his password. He does this by 
+He then generates a primary transaction to prove that he has a secret s. In fact that secret is his password. He does this by 
 by pushing a request to the secure ether smart contract with:
 ```
 hash(hash(PW) + salt + newpubkey) + hash(username)
@@ -49,9 +51,22 @@ has been hashed previously as the secret. Meaning he pushes on the stack:
 hash(PW) + salt + newpubkey + hash(username)
 ```
 This proves he is the owner of the correct password and is allowed to move the stuck coins back to a private key in his 
-possession. If this transaction is successful the 10% of  your coins you needed to risk previously is also spent to your new address minus the used Gas. However there is a one month timelock on this transaction. This is for the following reason:
+possession. If this transaction is successful the 10% of  your coins you needed to risk previously is also spent to his new address minus the used Gas. However there is a one month timelock on this transaction. This is for the following reason:
 
-Should an adversary be able to find the inverse of the published hash (your password) and try to spend your coins, you have 
-a one month time window to quickly come online and make a small proof, that you are still in possession of your private keys. 
- If you manage to do this the 10% of your funds the attacker risked is directly spent to you. This makes it uneconomic 
- for the adversary to just try attacking random nodes in the network using the secure ether ERC 20. 
+Should an adversary be able to find the inverse of the published hash (your password) and try to spend your coins, you 
+have a one month time window to quickly come online and make a small proof, that you are still in possession of 
+your private keys. If you manage to do this the 10% of your funds the attacker risked is directly spent to you. 
+This makes it uneconomic  for the adversary to just try attacking random nodes in the network using the secure ether 
+ERC 20. 
+
+# Architecture Explained
+
+The app uses the following architecture: The user interface is built on electron (located in folder of the same name - how surprising), the interface between ethereum and electron is written with the java script ethereum library. The core of
+the code is a solidity contract (in SmartContracts) that powers the secure
+ether ERC20. The solidity contract is compiled and deployed using truffle and is run on a local geth client. The same 
+geth client is also being used for the electron app to communicate with the electron app. Due to complications with 
+versioning a web server is being used between electron and the javascript talking to geth. Hopefully this can be removed 
+in the future. 
+
+
+

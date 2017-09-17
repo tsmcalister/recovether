@@ -12,6 +12,8 @@ import Slide from 'material-ui/transitions/Slide'
 import Input, { InputLabel } from 'material-ui/Input'
 import { FormControl } from 'material-ui/Form'
 
+import { inject, observer } from 'mobx-react'
+
 const Container = styled.div`
 	max-width: 100%;
 	padding-left: 30px;
@@ -25,8 +27,8 @@ const Container = styled.div`
 
 const StyledButton = styled(Button)`margin-top: 10px;`
 
-const warning = <Typography>WARNING</Typography>
-
+@inject('api', 'auth')
+@observer
 class Withdraw extends Component {
 	render() {
 		const { open, onClose } = this.props
