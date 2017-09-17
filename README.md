@@ -1,6 +1,6 @@
 # recovether - Project submission for HackZurich 2017
 
-<img src="/img/logo-gh.png">
+<img src="/img/logo-banner.png">
 
 recovether is a new cross platform ethereum wallet that interacts with a secure public smart contract to solve the problem of private key loss, by giving the user the ability to redeem his funds with a username-password combination, thereby greatly increasing accesibility to ethereum for the average person. 
 
