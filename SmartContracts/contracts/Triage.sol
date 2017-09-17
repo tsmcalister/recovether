@@ -104,7 +104,7 @@ contract Triage is TriageInterface {
 	    AccountInitialization(msg.sender);
 
         // deposit funds if the user sent some
-        if(msg.value > 0){
+        if(funds > 0){
             balances[pubKey] += funds;
             totalSupply += funds;
             
