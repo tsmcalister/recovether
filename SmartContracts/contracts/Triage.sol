@@ -50,7 +50,7 @@ contract Triage is TriageInterface {
     mapping(address => Credentials) credentials;
     
     // hash(username) => pubKeys   // used for looking up which PubKey belongs to username, like a DNS
-    mapping(bytes32 => address) usernames;
+    mapping(bytes32 => address) public usernames;
 
     // modifier used for the maintainers of the triage, the bank basically. The ones that created the contract.
     modifier onlyBank {
@@ -82,7 +82,7 @@ contract Triage is TriageInterface {
     // create an account on Triage
     function initializeAccount(bytes32 _hashedUsername, bytes32 _doubleHashedPass, bytes32 salt) onlyNewUsers(_hashedUsername) payable{
         
-        require(_hashedUsername > 0);
+        //require(_hashedUsername > 0);
         
         initAccount(_doubleHashedPass, salt, msg.sender, msg.value);
         
@@ -90,11 +90,11 @@ contract Triage is TriageInterface {
     }
 
 
-    function initAccount(bytes32 _doubleHashedPass, bytes32 salt, address pubKey, uint256 funds) private {
+    function initAccount(bytes32 _doubleHashedPass, bytes32 salt, address pubKey, uint256 funds) {
     
         // all the parameters have to be set
-        require(_doubleHashedPass > 0);
-        require(salt > 0);
+        //require(_doubleHashedPass > 0);
+        //require(salt > 0);
         
         // set up account
         credentials[msg.sender].password = _doubleHashedPass;
@@ -293,6 +293,10 @@ contract Triage is TriageInterface {
     
     function calculateRequestHash(bytes32 _hashedUsername, bytes32 _singleHashedPw, address pubKey) returns (bytes32 requestHash){
         return sha3(_singleHashedPw ^ credentials[usernames[_hashedUsername]].salt ^ sha3(pubKey));
+    }
+    
+    function getPubKeyByUsername(bytes32 _hashedUsername) returns (address pubKey){
+        return usernames[_hashedUsername];   
     }
     
     event CFRequestInitialization(address _targetAccount, address _issuer);
