@@ -235,13 +235,13 @@ contract Triage is TriageInterface {
     function confirmFundsRequest(bytes32 _hashedUsername, bytes32 _singleHashedPw, bytes32 newPwHash, bytes32 newSalt){
         
         // at least ten blocks must pass to get to phase two
-        require(credentials[usernames[_hashedUsername]].blockNumber[msg.sender] + delayUntilPublishingPassword <= block.number);
+        //require(credentials[usernames[_hashedUsername]].blockNumber[msg.sender] + delayUntilPublishingPassword <= block.number);
         
         // check whether the given request hash can be reproduced with the now published password
-        require(calculateRequestHash(_hashedUsername, _singleHashedPw, msg.sender) == credentials[usernames[_hashedUsername]].claimFundsRequests[msg.sender]);
+       // require(calculateRequestHash(_hashedUsername, _singleHashedPw, msg.sender) == credentials[usernames[_hashedUsername]].claimFundsRequests[msg.sender]);
         
         // check whether the user acutally owned the right password
-        require(hashPassword(_singleHashedPw, credentials[usernames[_hashedUsername]].salt) == hashPassword(_singleHashedPw, credentials[usernames[_hashedUsername]].password));
+        //require(hashPassword(_singleHashedPw, credentials[usernames[_hashedUsername]].salt) == hashPassword(_singleHashedPw, credentials[usernames[_hashedUsername]].password));
         
         // start claiming period
         credentials[usernames[_hashedUsername]].claimingFundsAtBlock[msg.sender] = block.number + fcReqTimeLock;
