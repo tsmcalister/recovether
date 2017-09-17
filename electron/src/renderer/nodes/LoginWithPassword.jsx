@@ -50,10 +50,11 @@ class LoginWithPassword extends Component {
 		this.setOpen(false)
 	}
 
-	handleSubmit = (login, password, newPassword) => {
+	handleSubmit = async (login, password, newPassword) => {
 		try {
 			const { api, auth } = this.props
-			api.logIn(login, password)
+			const res = await api.createKeyPair()
+			console.log({ res })
 			auth.setPassword(password)
 			auth.setNewPassword(newPassword)
 			this.goToAccount()

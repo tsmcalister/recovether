@@ -1,6 +1,33 @@
+const ws = new WebSocket('ws://localhost:8080')
+let i = 0
+
 export class API {
-	loadKey(pathname, password) {
-		// throw new Error('Unable to decrypt password')
+	map = new Map()
+
+	constructor() {
+		ws.onmessage = async event => {
+			const message = JSON.parse(event.data)
+			console.log({ message })
+			const handler = this.map.get(message.id)
+			handler(message.value)
+			this.map.delete(message.id)
+		}
+	}
+
+	send(type, value) {
+		i++
+		ws.send(
+			JSON.stringify({
+				type,
+				id: i,
+				value
+			})
+		)
+		return new Promise(resolve => this.map.set(i, resolve))
+	}
+
+	createKeyPair() {
+		return this.send('createKeyPair')
 	}
 
 	logIn(login, password) {

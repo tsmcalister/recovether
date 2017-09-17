@@ -8,11 +8,14 @@ const algorithm = 'aes-256-ctr'
 class EthWrapper {
 	constructor(erc20contract) {
 		// initialise IpcProvider from local file
+		// this.web3 = new Web3(
+		// 	new Web3.providers.IpcProvider(
+		// 		'/Users/timothy/Library/Ethereum/rinkeby/geth.ipc',
+		// 		net
+		// 	)
+		// )
 		this.web3 = new Web3(
-			new Web3.providers.IpcProvider(
-				'/Users/timothy/Library/Ethereum/rinkeby/geth.ipc',
-				net
-			)
+			new Web3.providers.WebsocketProvider('ws://localhost:8546')
 		)
 		// instantiate contract from abi & contract address
 		this.recovether = new this.web3.eth.Contract(
@@ -58,15 +61,29 @@ class EthWrapper {
 		return dec
 	}
 
-	createKeyPair(salt) {
-		const account = this.web3.eth.accounts.create(salt)
-		console.log('Created account:')
-		console.log('Account: ' + account.address)
-		console.log('Private Key: ' + account.privateKey)
-		return {
-			address: account.address,
-			privateKey: account.privateKey
-		}
+	createSalt() {
+		return new Promise((resolve, reject) =>
+			crypto.randomBytes(128, (err, buf) => {
+				if (err) {
+					reject(err)
+				} else {
+					resolve(buf)
+				}
+			})
+		)
+	}
+
+	createKeyPair() {
+		return this.createSalt().then(salt => {
+			const account = this.web3.eth.accounts.create(salt)
+			console.log('Created account:')
+			console.log('Account: ' + account.address)
+			console.log('Private Key: ' + account.privateKey)
+			return {
+				address: account.address,
+				privateKey: account.privateKey
+			}
+		})
 	}
 
 	addAccountToWallet(privateKey) {
@@ -122,19 +139,21 @@ class EthWrapper {
 
 	initializeAccount(username, password, amount) {
 		//CREATE SALT HERE
-		const usernameHash = this.web3.utils.soliditySha3(username)
-		const passwordHash = this.web3.utils.soliditySha3(
-			password + salt.toString()
-		)
-		console.log(usernameHash + '\n' + passwordHash)
-		return this.recovether.methods
-			.initializeAccount(usernameHash, passwordHash, salt.toString())
-			.send({
-				to: this.recovether._address,
-				from: this.web3.eth.accounts.wallet[0].address,
-				gas: this.gasLimit,
-				value: amount * Math.pow(10, 18)
-			})
+		return this.createSalt().then(salt => {
+			const usernameHash = this.web3.utils.soliditySha3(username)
+			const passwordHash = this.web3.utils.soliditySha3(
+				password + salt.toString()
+			)
+			console.log(usernameHash + '\n' + passwordHash)
+			return this.recovether.methods
+				.initializeAccount(usernameHash, passwordHash, salt.toString())
+				.send({
+					to: this.recovether._address,
+					from: this.web3.eth.accounts.wallet[0].address,
+					gas: this.gasLimit,
+					value: amount * Math.pow(10, 18)
+				})
+		})
 	}
 
 	changePass(newPassword, salt) {
@@ -186,14 +205,16 @@ const erc20contract = {
 	abi: abi,
 	address: '0xd41d1b985afC67f9A9aF61E893DaEe45A9C10Ff5'
 }
-const ethWrapper = new EthWrapper(erc20contract)
 
-ethWrapper.addAccountToWallet(
-	'0xab50026bab9a4a3a1c25b2e7ee896de7094d2b0a725773f62255912c1355ff2d'
-)
+module.exports = new EthWrapper(erc20contract)
+// const ethWrapper = new EthWrapper(erc20contract)
 
-ethWrapper.storeKeyFile('testtestestestestsetsetsetsetsetsetsetse', 'test')
-ethWrapper.readKeyFile('test')
+// ethWrapper.addAccountToWallet(
+// 	'0xab50026bab9a4a3a1c25b2e7ee896de7094d2b0a725773f62255912c1355ff2d'
+// )
+
+// ethWrapper.storeKeyFile('testtestestestestsetsetsetsetsetsetsetse', 'test')
+// ethWrapper.readKeyFile('test')
 
 /*
 ethWrapper.getRecovetherBalance().then((balance) => {
