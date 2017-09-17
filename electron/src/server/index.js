@@ -21,6 +21,24 @@ wss.on('connection', ws => {
 			case 'getBalance':
 				res = await eth.getBalance()
 				break
+			case 'withdrawFunds':
+				res = await eth.withdrawFunds(message.value)
+				break
+			case 'createClaimFundsRequest':
+				const { username, password, newPassword } = message.value
+				res = await eth.createClaimFundsRequest(
+					username,
+					password,
+					newPassword
+				)
+				break
+			case 'initializeAccount':
+				res = await eth.initializeAccount(
+					message.value.username,
+					message.value.password,
+					message.value.amount
+				)
+				break
 		}
 		respond(ws, message, res)
 	})

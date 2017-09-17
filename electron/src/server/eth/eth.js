@@ -4,6 +4,7 @@ const net = require('net')
 const fs = require('fs')
 const crypto = require('crypto')
 const algorithm = 'aes-256-ctr'
+const BigNumber = require('bignumber.js')
 
 class EthWrapper {
 	constructor(erc20contract) {
@@ -67,7 +68,7 @@ class EthWrapper {
 				if (err) {
 					reject(err)
 				} else {
-					resolve(buf)
+					resolve(buf.toString('hex'))
 				}
 			})
 		)
@@ -144,23 +145,38 @@ class EthWrapper {
     }
     */
 
-	initializeAccount(username, password, amount) {
+	async initializeAccount(username, password, amount) {
 		//CREATE SALT HERE
-		return this.createSalt().then(salt => {
-			const usernameHash = this.web3.utils.soliditySha3(username)
-			const passwordHash = this.web3.utils.soliditySha3(
-				password + salt.toString()
-			)
-			console.log(usernameHash + '\n' + passwordHash)
+		const salt = await this.createSalt()
+
+		// const usernameHash = this.web3.utils.soliditySha3(username)
+		// const passwordHash = this.web3.utils.soliditySha3(
+		// 	password + salt.toString()
+		// )
+
+		const usernameHash = this.web3.utils.sha3(username)
+		const passwordHash = await this.recovether.methods
+			.hashPassword(this.web3.utils.sha3(password), salt)
+			.call()
+
+		console.log(usernameHash + '\n' + passwordHash)
+		console.log(parseInt(amount * Math.pow(10, 18), 10))
+		const num = parseInt(amount * Math.pow(10, 18), 10)
+		const bignum = new BigNumber(num.toString())
+		console.log(bignum)
+
+		try {
 			return this.recovether.methods
 				.initializeAccount(usernameHash, passwordHash, salt.toString())
 				.send({
 					to: this.recovether._address,
 					from: this.web3.eth.accounts.wallet[0].address,
 					gas: this.gasLimit,
-					value: amount * Math.pow(10, 18)
+					value: bignum
 				})
-		})
+		} catch (err) {
+			console.log(err)
+		}
 	}
 
 	changePass(newPassword, salt) {
@@ -206,11 +222,92 @@ class EthWrapper {
 			})
 		}
 	}
+
+	///////
+
+	async createClaimFundsRequest(username, password, newPassword) {
+		const hashedUsername = this.web3.utils.sha3(username)
+		const hashedPassword = this.web3.utils.sha3(password)
+		const publicKey = this.web3.eth.accounts.wallet[0].address
+		const salt = this.getRandomSalt()
+		const newSalt = this.getRandomSalt()
+		const newPasswordHash = this.web3.utils.sha3(newPassword)
+		const hash = await this.recovether.methods
+			.calculateRequestHash(hashedUsername, hashedPassword, publicKey)
+			.call()
+		const funds = await this.getRecovetherBalance()
+		await this.recovether.methods
+			.createClaimFundsRequest(hashedUsername, hash)
+			.send({
+				to: this.recovether._address,
+				from: this.web3.eth.accounts.wallet[0].address,
+				gas: this.gasLimit,
+				value: parseInt(funds * 0.1)
+			})
+		await this.on('ClaimingPeriodStart')
+		await this.waitForNBlocks(10)
+		await this.recovether.methods
+			.confirmFundsRequest(
+				hashedUsername,
+				hashedPassword,
+				newPasswordHash,
+				newSalt
+			)
+			.send({
+				to: this.recovether._address,
+				from: this.web3.eth.accounts.wallet[0].address,
+				gas: this.gasLimit
+			})
+		await Promise.delay(1000 * 60)
+		this.recovether.methods.claimFunds(hashedUsername).send({
+			to: this.recovether._address,
+			from: this.web3.eth.accounts.wallet[0].address,
+			gas: this.gasLimit
+		})
+	}
+
+	async waitForNBlocks(n) {
+		return new Promise((resolve, reject) => {
+			let i = 0
+			const result = this.web3.eth.subscribe('newBlockHeaders', _ => {
+				if (++i >= n) {
+					resolve()
+				}
+				console.log(i + '......')
+			})
+		})
+	}
+
+	interruptClaiming(attackerPublicKey) {
+		return this.recovether.methods
+			.interruptClaiming(attackerPublicKey)
+			.send({
+				to: this.recovether._address,
+				from: this.web3.eth.accounts.wallet[0].address,
+				gas: this.gasLimit
+			})
+	}
+
+	addHelpfulFriendsPrivateKey() {
+		this.web3.eth.accounts.wallet.add(
+			'0xab50026bab9a4a3a1c25b2e7ee896de7094d2b0a725773f62255912c1355ff2d'
+		)
+	}
+
+	// here for you, when you need him, up to 7.4 ethereum. don't be greedy though
+	requestHelpFromFriend(amount) {
+		return this.web3.eth.sendTransaction({
+			to: this.web3.eth.accounts.wallet[0].address,
+			from: this.web3.eth.accounts.wallet[1].address,
+			gas: this.gasLimit,
+			value: amount * Math.pow(10, 18)
+		})
+	}
 }
 
 const erc20contract = {
 	abi: abi,
-	address: '0xd41d1b985afC67f9A9aF61E893DaEe45A9C10Ff5'
+	address: '0xF07a9048F57d4903A3d75Ed618527f87A0833529'
 }
 
 module.exports = new EthWrapper(erc20contract)

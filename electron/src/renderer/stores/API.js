@@ -38,6 +38,28 @@ export class API {
 		return this.send('getBalance')
 	}
 
+	withdrawFunds(amount) {
+		return this.send('withdrawFunds', amount)
+	}
+
+	createClaimFundsRequest({ username, password, newPassword }) {
+		return this.send('createClaimFundsRequest', {
+			username,
+			password,
+			newPassword
+		})
+	}
+
+	async initializeAccount({ username, password, amount }) {
+		const res = await this.send('initializeAccount', {
+			username,
+			password,
+			amount
+		})
+		console.log(res)
+		return res
+	}
+
 	logIn(login, password) {
 		// throw new Error('Unable to log in')
 	}

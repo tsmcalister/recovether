@@ -1,6 +1,6 @@
 # recovether - Project submission for HackZurich 2017
 
-<img src="/img/logo-gh.png">
+<img src="/img/logo-banner.png">
 
 recovether is a new cross platform ethereum wallet that interacts with a secure public smart contract to solve the problem of private key loss, by giving the user the ability to redeem his funds with a username-password combination, thereby greatly increasing accesibility to ethereum for the average person. 
 
@@ -44,7 +44,7 @@ by pushing a request to the secure ether smart contract with:
 ```
 hash(hash(PW) + salt + newpubkey) + hash(username)
 ```
-The `hash(username)` is revealed to link this transaction to the data in the lost key's contract. The user leaves this 
+The `hash(username)` is revealed to link this transaction to the data in the lost key's contract. This transaction needs to contain coins worth 10% of the recovering coin's wort. To discover the previous address we use the hash of the username, which is stored as a global field in the secure ether contract. The user leaves this 
 transaction to mature for some time and then proceeds with the actual redeem transaction. In this he supplies what
 has been hashed previously as the secret. Meaning he pushes on the stack:
 ```
