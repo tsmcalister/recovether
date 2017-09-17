@@ -44,14 +44,14 @@ by pushing a request to the secure ether smart contract with:
 ```
 hash(hash(PW) + salt + newpubkey) + hash(username)
 ```
-The `hash(username)` is revealed to link this transaction to the data in the lost key's contract. The user leaves this 
+The `hash(username)` is revealed to link this transaction to the data in the lost key's contract. This transaction needs to contain coins worth 10% of the recovering coin's wort. To discover the previous address we use the hash of the username, which is stored as a global field in the secure ether contract. The user leaves this 
 transaction to mature for some time and then proceeds with the actual redeem transaction. In this he supplies what
 has been hashed previously as the secret. Meaning he pushes on the stack:
 ```
 hash(PW) + salt + newpubkey + hash(username)
 ```
 This proves he is the owner of the correct password and is allowed to move the stuck coins back to a private key in his 
-possession. To discover the previous address we use the hash of the username, which is stored as a global field in the secure ether contract. If this transaction is successful the 10% of  your coins you needed to risk previously is also spent to his new address minus the used Gas. However there is a one month timelock on this transaction. This is for the following reason:
+possession. If this transaction is successful the 10% of  your coins you needed to risk previously is also spent to his new address minus the used Gas. However there is a one month timelock on this transaction. This is for the following reason:
 
 Should an adversary be able to find the inverse of the published hash (your password) and try to spend your coins, you 
 have a one month time window to quickly come online and make a small proof, that you are still in possession of 
