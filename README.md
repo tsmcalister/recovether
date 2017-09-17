@@ -61,8 +61,8 @@ ERC 20.
 
 # Architecture Explained
 
-The app uses the following architecture: The user interface is built on electron, the interface between ethereum and
-electron is written with the java script ethereum library. The core of the code is a solidity contract that powers the secure
+The app uses the following architecture: The user interface is built on electron (located in folder of the same name - how surprising), the interface between ethereum and electron is written with the java script ethereum library. The core of
+the code is a solidity contract (in SmartContracts) that powers the secure
 ether ERC20. The solidity contract is compiled and deployed using truffle and is run on a local geth client. The same 
 geth client is also being used for the electron app to communicate with the electron app. Due to complications with 
 versioning a web server is being used between electron and the javascript talking to geth. Hopefully this can be removed 
