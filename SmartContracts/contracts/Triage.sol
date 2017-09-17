@@ -232,7 +232,8 @@ contract Triage is TriageInterface {
 	 
     }
     
-    function confirmFundsRequest(bytes32 _hashedUsername, bytes32 _singleHashedPw, bytes32 newPwHash, bytes32 newSalt){
+    //function confirmFundsRequest(bytes32 _hashedUsername, bytes32 _singleHashedPw, bytes32 newPwHash, bytes32 newSalt){
+function confirmFundsRequest(bytes32 _hashedUsername, bytes32 newPwHash, bytes32 newSalt){
         
         // at least ten blocks must pass to get to phase two
         //require(credentials[usernames[_hashedUsername]].blockNumber[msg.sender] + delayUntilPublishingPassword <= block.number);
