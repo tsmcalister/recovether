@@ -54,7 +54,8 @@ class LoginWithPassword extends Component {
 		try {
 			const { api, auth } = this.props
 			const res = await api.createKeyPair()
-			console.log({ res })
+			auth.setAddress(res.address)
+			auth.setLogin(login)
 			auth.setPassword(password)
 			auth.setNewPassword(newPassword)
 			this.goToAccount()

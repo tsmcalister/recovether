@@ -10,9 +10,10 @@ import Typography from 'material-ui/Typography'
 import CloseIcon from 'material-ui-icons/Close'
 import Slide from 'material-ui/transitions/Slide'
 import Input, { InputLabel } from 'material-ui/Input'
-import { FormControl } from 'material-ui/Form'
+import { FormControl, FormHelperText } from 'material-ui/Form'
 
 import { inject, observer } from 'mobx-react'
+import { observable, action, computed } from 'mobx'
 
 const Container = styled.div`
 	max-width: 100%;
@@ -30,6 +31,23 @@ const StyledButton = styled(Button)`margin-top: 10px;`
 @inject('api', 'auth')
 @observer
 class Withdraw extends Component {
+	@observable amount = 0
+
+	@action setAmount = event => (this.amount = event.target.value)
+
+	@computed
+	get isValid() {
+		return (
+			this.amount >= 0 &&
+			this.amount <= parseFloat(this.props.available, 10)
+		)
+	}
+
+	handleWithdrawal = async () => {
+		await this.props.api.withdrawFunds(this.amount)
+		this.props.onClose()
+	}
+
 	render() {
 		const { open, onClose } = this.props
 
@@ -37,7 +55,7 @@ class Withdraw extends Component {
 			<Dialog
 				fullScreen
 				open={open}
-				onRequestClose={this.handleRequestClose}
+				onRequestClose={this.onClose}
 				transition={<Slide direction="up" />}
 			>
 				<AppBar>
@@ -55,17 +73,34 @@ class Withdraw extends Component {
 					</Toolbar>
 				</AppBar>
 				<Container>
-					<FormControl fullWidth margin="normal">
-						<InputLabel htmlFor="destination">
-							Transfer to:
-						</InputLabel>
-						<Input id="destination" fullWidth />
-					</FormControl>
-					<FormControl fullWidth margin="normal">
+					<Typography type="headline">{`${this.props
+						.available} ETH available`}</Typography>
+
+					<FormControl
+						fullWidth
+						margin="normal"
+						error={!this.isValid}
+					>
 						<InputLabel htmlFor="amount">Amount:</InputLabel>
-						<Input id="amount" fullWidth />
+						<Input
+							id="amount"
+							fullWidth
+							value={this.amount}
+							onChange={this.setAmount}
+							type="number"
+						/>
+						{!this.isValid && (
+							<FormHelperText>
+								An amount can not exceed your safe balance!
+							</FormHelperText>
+						)}
 					</FormControl>
-					<StyledButton color="primary" raised>
+					<StyledButton
+						color="primary"
+						raised
+						disabled={!this.isValid}
+						onClick={this.handleWithdrawal}
+					>
 						transfer
 					</StyledButton>
 				</Container>

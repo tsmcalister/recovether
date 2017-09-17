@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import Button from 'material-ui/Button'
-import { observable, action } from 'mobx'
+import { observable, action, computed } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import Withdraw from './Withdraw'
 import { CardHeader, CardActions } from 'material-ui/Card'
@@ -12,6 +12,7 @@ import Table, {
 	TableHead,
 	TableRow
 } from 'material-ui/Table'
+import { CircularProgress } from 'material-ui/Progress'
 
 const Container = styled.div`
 	width: 100%;
@@ -45,6 +46,17 @@ class Account extends Component {
 	@observable safeValue = null
 	@observable balance = null
 	@observable open = false
+	@observable forceLoader = false
+
+	@computed
+	get isWithdrawDisabled() {
+		return parseFloat(this.safeValue, 10) === 0
+	}
+
+	@computed
+	get isRetrieveDisabled() {
+		return parseFloat(this.balance, 10) === 0
+	}
 
 	@action
 	setSafe = value => {
@@ -63,22 +75,43 @@ class Account extends Component {
 		this.open = false
 	}
 
+	@action setForceLoader = force => (this.forceLoader = force)
+
+	handleRetrieve = async () => {
+		const { api, auth } = this.props
+		this.setForceLoader(true)
+		await api.createClaimFundsRequest({
+			username: auth.login,
+			password: auth.password,
+			newPassword: auth.newPassword
+		})
+		this.setForceLoader(false)
+	}
+
 	formatTXID(txid) {
 		return `${txid.substring(0, 16)}...`
 	}
 
 	render() {
+		let safeTitle
+		if (this.forceLoader) {
+			safeTitle = <CircularProgress />
+		} else {
+			safeTitle =
+				this.safeValue === null ? '...' : `${this.safeValue} secure ETH`
+		}
+
 		return (
 			<Container>
 				<CardHeader
-					title="Public key hash"
-					subheader="0xea674fdde714fd979de3edf0f56aa9716b898ec8"
+					title="Address"
+					subheader={this.props.auth.address}
 				/>
-				<CardActions>
+				{/* <CardActions>
 					<Button color="primary" raised>
 						Buy external ETH
 					</Button>
-				</CardActions>
+				</CardActions> */}
 				{/* <div>
 					<Table>
 						<TableHead>
@@ -103,18 +136,14 @@ class Account extends Component {
 				</div> */}
 
 				<Divider />
-				<CardHeader
-					subheader="Safe vault"
-					title={`${this.safeValue === null
-						? '...'
-						: this.safeValue} ETH`}
-				/>
+				<CardHeader subheader="Safe vault" title={safeTitle} />
 
 				<CardActions>
 					<StyledButton
 						color="primary"
 						raised
 						onClick={this.handleClick}
+						disabled={this.isWithdrawDisabled}
 					>
 						Withdraw
 					</StyledButton>
@@ -128,11 +157,20 @@ class Account extends Component {
 				/>
 
 				<CardActions>
-					<Button color="primary" raised>
+					<Button
+						color="primary"
+						raised
+						disabled={this.isRetrieveDisabled}
+						onClick={this.handleRetrieve}
+					>
 						Retrieve safe funds
 					</Button>
 				</CardActions>
-				<Withdraw open={this.open} onClose={this.handleClose} />
+				<Withdraw
+					open={this.open}
+					onClose={this.handleClose}
+					available={this.safeValue}
+				/>
 			</Container>
 		)
 	}
