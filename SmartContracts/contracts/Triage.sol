@@ -23,7 +23,7 @@ contract Triage is TriageInterface {
     uint256 constant delayUntilPublishingPassword = 10; 
 
     // Minimal amount of time that needs to pass for a FC Request to be executed
-    uint256 constant fcReqTimeLock = 3 weeks; 
+    uint256 constant fcReqTimeLock = 1 minutes; 
 
     string public constant name = "Secure Ether";
     string public constant symbol = "SETH";
@@ -84,15 +84,15 @@ contract Triage is TriageInterface {
         
         require(_hashedUsername > 0);
         
-        initAccount(_hashedUsername, _doubleHashedPass, salt, msg.sender, msg.value);
+        initAccount(_doubleHashedPass, salt, msg.sender, msg.value);
         
         usernames[_hashedUsername] = msg.sender;
     }
 
 
-    function initAccount(bytes32 _doubleHashedPass, bytes32 salt, address pubKey, uint256 funds) onlyNewUsers(_hashedUsername) private {
+    function initAccount(bytes32 _doubleHashedPass, bytes32 salt, address pubKey, uint256 funds) private {
     
-          // all the parameters have to be set
+        // all the parameters have to be set
         require(_doubleHashedPass > 0);
         require(salt > 0);
         
@@ -251,7 +251,7 @@ contract Triage is TriageInterface {
         credentials[usernames[_hashedUsername]].cfRequestsBlocked = true;
         
         // init account but do not yet set the username, because this could still be an attack.
-        initAccount(_doubleHashedPass, newPwhash, newSalt, msg.sender, 0);
+        initAccount(newPwHash, newSalt, msg.sender, 0);
         
     }
     
@@ -273,10 +273,10 @@ contract Triage is TriageInterface {
         require(credentials[msg.sender].claimFundsRequests[_attacker] > 0);
         
         // remove the claim request
-        credentials[msg.sender].claimFundsRequests[_attacker] = 0;
+        credentials[msg.sender].claimFundsRequests[_attacker] = 0x0;
         
         // remove the claiming at block premise
-        credentials[usernames[msg.sender]].claimingFundsAtBlock[_attacker] = 0;
+        credentials[msg.sender].claimingFundsAtBlock[_attacker] = 0;
         
         // reallocate the funds of the attacker
         balances[msg.sender] = credentials[msg.sender].depositedEther[_attacker] / 3; //  1/3 goes to the victim of the attack
