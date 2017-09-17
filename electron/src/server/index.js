@@ -2,14 +2,26 @@ const WebSocket = require('ws')
 const wss = new WebSocket.Server({ port: 8080 })
 const eth = require('./eth/eth')
 
+function respond(ws, message, value) {
+	ws.send(JSON.stringify({ id: message.id, value }))
+}
+
 wss.on('connection', ws => {
 	ws.on('message', async string => {
 		const message = JSON.parse(string)
+		let res
 		switch (message.type) {
 			case 'createKeyPair':
-				const res = await eth.createKeyPair()
-				ws.send(JSON.stringify({ id: message.id, value: res }))
+				res = await eth.createKeyPair()
+				eth.addAccountToWallet(res.privateKey)
+				break
+			case 'getRecovetherBalance':
+				res = await eth.getRecovetherBalance()
+				break
+			case 'getBalance':
+				res = await eth.getBalance()
 				break
 		}
+		respond(ws, message, res)
 	})
 })

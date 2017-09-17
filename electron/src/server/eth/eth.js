@@ -8,15 +8,15 @@ const algorithm = 'aes-256-ctr'
 class EthWrapper {
 	constructor(erc20contract) {
 		// initialise IpcProvider from local file
-		// this.web3 = new Web3(
-		// 	new Web3.providers.IpcProvider(
-		// 		'/Users/timothy/Library/Ethereum/rinkeby/geth.ipc',
-		// 		net
-		// 	)
-		// )
 		this.web3 = new Web3(
-			new Web3.providers.WebsocketProvider('ws://localhost:8546')
+			new Web3.providers.IpcProvider(
+				'/Users/wasd171/Library/Ethereum/rinkeby/geth.ipc',
+				net
+			)
 		)
+		// this.web3 = new Web3(
+		// 	new Web3.providers.WebsocketProvider('ws://localhost:8546')
+		// )
 		// instantiate contract from abi & contract address
 		this.recovether = new this.web3.eth.Contract(
 			erc20contract.abi,
@@ -79,6 +79,7 @@ class EthWrapper {
 			console.log('Created account:')
 			console.log('Account: ' + account.address)
 			console.log('Private Key: ' + account.privateKey)
+
 			return {
 				address: account.address,
 				privateKey: account.privateKey
@@ -96,6 +97,12 @@ class EthWrapper {
 		return this.recovether.methods
 			.balanceOf(this.web3.eth.accounts.wallet[0].address)
 			.call()
+	}
+
+	getBalance() {
+		return this.web3.eth.getBalance(
+			this.web3.eth.accounts.wallet[0].address
+		)
 	}
 
 	withdrawFunds(amount) {

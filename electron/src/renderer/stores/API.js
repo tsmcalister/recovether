@@ -7,7 +7,7 @@ export class API {
 	constructor() {
 		ws.onmessage = async event => {
 			const message = JSON.parse(event.data)
-			console.log({ message })
+
 			const handler = this.map.get(message.id)
 			handler(message.value)
 			this.map.delete(message.id)
@@ -28,6 +28,14 @@ export class API {
 
 	createKeyPair() {
 		return this.send('createKeyPair')
+	}
+
+	getSafeBalance() {
+		return this.send('getRecovetherBalance')
+	}
+
+	getBalance() {
+		return this.send('getBalance')
 	}
 
 	logIn(login, password) {
