@@ -1,5 +1,5 @@
-var ConvertLib = artifacts.require("./TriageInterface.sol");
-var MetaCoin = artifacts.require("./Triage.sol");
+var TriageInterface = artifacts.require("./TriageInterface.sol");
+var Triage = artifacts.require("./Triage.sol");
 
 module.exports = function(deployer) {
   deployer.deploy(TriageInterface);
